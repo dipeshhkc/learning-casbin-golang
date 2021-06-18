@@ -7,4 +7,4 @@
 
 ### Middleware Casbin 
 
-<img src="./middleware.jpg">
+<img src="./casbin-middleware.jpg">
