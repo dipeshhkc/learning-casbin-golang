@@ -8,12 +8,14 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/casbin/casbin/v2"
+
 	"github.com/gin-gonic/gin"
 )
 
 // UserController : represent the user's controller contract
 type UserController interface {
-	AddUser(*gin.Context)
+	AddUser(enforcer *casbin.Enforcer) gin.HandlerFunc
 	GetUser(*gin.Context)
 	GetAllUser(*gin.Context)
 	SignInUser(*gin.Context)
@@ -84,22 +86,25 @@ func (h userController) SignInUser(ctx *gin.Context) {
 
 }
 
-func (h userController) AddUser(ctx *gin.Context) {
-	var user model.User
-	if err := ctx.ShouldBindJSON(&user); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	utils.HashPassword(&user.Password)
-	user, err := h.userRepo.AddUser(user)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+func (h userController) AddUser(enforcer *casbin.Enforcer) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var user model.User
+		if err := ctx.ShouldBindJSON(&user); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		utils.HashPassword(&user.Password)
+		user, err := h.userRepo.AddUser(user)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+
+		}
+		enforcer.AddGroupingPolicy(fmt.Sprint(user.ID), user.Role)
+		user.Password = ""
+		ctx.JSON(http.StatusOK, user)
 
 	}
-	user.Password = ""
-	ctx.JSON(http.StatusOK, user)
-
 }
 
 func (h userController) UpdateUser(ctx *gin.Context) {

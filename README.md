@@ -1,4 +1,4 @@
-## R&D on Implementation of casbin on golang gorm projects
+## Implementation of casbin on golang gorm projects
 
 ### Go through my article on [Understanding Casbin with different Access Control Model Configurations](https://medium.com/wesionary-team/understanding-casbin-with-different-access-control-model-configurations-faebc60f6da5) 
 
