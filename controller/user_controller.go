@@ -47,7 +47,7 @@ func (h userController) GetAllUser(ctx *gin.Context) {
 }
 
 func (h userController) GetUser(ctx *gin.Context) {
-	id := ctx.Param("id")
+	id := ctx.Param("user")
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
